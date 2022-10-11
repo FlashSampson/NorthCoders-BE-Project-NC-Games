@@ -80,4 +80,14 @@ describe("GET /api/categories", () => {
         });
     });
   });
+
+describe('PATCH /api/reviews/:review_id', () => {
+    test('Request body accepts an object in the correct form ', () => {
+        return request(app).patch('/api/reviews/3')
+    });
+    test('Responds with updated review ', () => {
+        
+    });
+});
+
 });

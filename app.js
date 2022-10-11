@@ -1,12 +1,14 @@
 const express = require("express");
 const app = express();
-const { getCategories, getReviews } = require("./controller");
+const { getCategories, getReviews, patchReview} = require("./controller");
 
 app.use(express.json());
 
 app.get("/api/categories", getCategories);
 
 app.get("/api/reviews/:review_id", getReviews);
+
+app.patch('/api/reviews/:review_id', patchReview)
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "route not found" });

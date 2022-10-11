@@ -1,4 +1,4 @@
-const { fetchCategories, fetchReviews } = require("./model");
+const { fetchCategories, fetchReviews, updateReview } = require("./model");
 
 exports.getCategories = (req, res, next) => {
   fetchCategories()
@@ -20,3 +20,9 @@ exports.getReviews = (req, res, next) => {
       next(err);
     });
 };
+
+exports.patchReview = (req, res, next) =>{
+  const {newVote} = req.params
+  console.log(newVote)
+  updateReview(newVote)
+}
