@@ -8,3 +8,5 @@ SELECT * FROM categories;
 
 
 SELECT * FROM reviews WHERE review_id = 1;
+
+SELECT * FROM users;

@@ -13,3 +13,11 @@ exports.fetchReviews = (review_id) => {
             return review[0];
     });
 };
+
+exports.fetchUsers = () => {
+    return db
+      .query(`SELECT * FROM users;`)
+      .then(({ rows: users }) => {
+              return users;
+      });
+  };
