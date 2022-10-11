@@ -21,3 +21,13 @@ exports.fetchUsers = () => {
               return users;
       });
   };
+
+  exports.updateReview = (voteIncrease) => {
+    const { newVote } = newVote;
+    console.log(voteIncrease, 'in the model')
+    return db
+      .query(`UPDATE reviews SET votes = votes + $1 RETURNING*` , [newVote])
+      .then(({ rows: review }) => {
+              return review;
+      });
+  };
