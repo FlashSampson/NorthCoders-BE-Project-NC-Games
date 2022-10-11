@@ -11,6 +11,16 @@ afterAll(() => {
 });
 
 describe("Error handling - invalid endpoint", () => {
+  describe("Error handling - invalid input", () => {
+    test("should respond with 400 error if invalid input recieved", () => {
+      return request(app)
+        .get("/api/reviews/bananas")
+        .expect(400)
+        .then(({ body }) => {
+            expect(body.msg).toBe('invalid input')
+        });
+    });
+  });
   test("should respond with 404 server error if incomplete path recieved", () => {
     return request(app)
       .get("/notARoute")
@@ -40,5 +50,34 @@ describe("GET /api/categories", () => {
           );
         });
       });
+  });
+  describe(" GET /api/reviews/:review_id", () => {
+    test("return an object ", () => {
+      return request(app)
+        .get("/api/reviews/1")
+        .then(({ body: review }) => {
+          expect(typeof review).toBe("object");
+        });
+    });
+
+    test("response should be a review object which should have the properties: review_id, title, review_body, designer, review_img_url, votes, category, owner, created_at", () => {
+      return request(app)
+        .get("/api/reviews/1")
+        .then(({ body: review }) => {
+          expect(typeof review).toBe("object");
+          expect(review).toEqual({
+            review_id: 1,
+            title: "Agricola",
+            category: "euro game",
+            designer: "Uwe Rosenberg",
+            owner: "mallionaire",
+            review_body: "Farmyard fun!",
+            review_img_url:
+              "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+            created_at: "2021-01-18T10:00:20.514Z",
+            votes: 1,
+          });
+        });
+    });
   });
 });

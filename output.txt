@@ -1,0 +1,31 @@
+You are now connected to database "nc_games_test" as user "keita_darby".
+             List of relations
+ Schema |    Name    | Type  |    Owner    
+--------+------------+-------+-------------
+ public | categories | table | keita_darby
+ public | comments   | table | keita_darby
+ public | reviews    | table | keita_darby
+ public | users      | table | keita_darby
+(4 rows)
+
+    username     |   name   |                                avatar_url                                 
+-----------------+----------+---------------------------------------------------------------------------
+ mallionaire     | haz      | https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg
+ philippaclaire9 | philippa | https://avatars2.githubusercontent.com/u/24604688?s=460&v=4
+ bainesface      | sarah    | https://avatars2.githubusercontent.com/u/24394918?s=400&v=4
+ dav3rid         | dave     | https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png
+(4 rows)
+
+       slug       |                     description                     
+------------------+-----------------------------------------------------
+ euro game        | Abstact games that involve little luck
+ social deduction | Players attempt to uncover each other's hidden role
+ dexterity        | Games involving physical skill
+ children's games | Games suitable for children
+(4 rows)
+
+ review_id |  title   | category  |   designer    |    owner    |  review_body  |                              review_img_url                               |       created_at        | votes 
+-----------+----------+-----------+---------------+-------------+---------------+---------------------------------------------------------------------------+-------------------------+-------
+         1 | Agricola | euro game | Uwe Rosenberg | mallionaire | Farmyard fun! | https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png | 2021-01-18 10:00:20.514 |     1
+(1 row)
+
