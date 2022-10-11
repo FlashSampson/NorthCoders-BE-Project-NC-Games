@@ -13,8 +13,3 @@ exports.fetchReviews = (review_id) => {
             return review[0];
     });
 };
-
-exports.updateReview = (newVote)=>{
-  return db.query(`"UPDATE restaurants SET area_id = $1 WHERE restaurant_id = $2 RETURNING * ",
-  [area_id, id]`).then(({rows:votes}))
-}
