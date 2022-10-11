@@ -1,2 +1,4 @@
 node_modules
-.env.*git 
+.env.*
+output.txt
+tester.sql
