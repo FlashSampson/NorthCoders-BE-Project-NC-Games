@@ -1,8 +1,11 @@
-const db = require("./db/index.js");
+const db = require("./db/connection");
 
 exports.fetchCategories = () => {
-  
-  return db.query(`SELECT * FROM  `).then(({ rows: categories }) => {
+
+return db.query(`SELECT * FROM categories;`).then(({ rows: categories }) => {
     return categories;
   });
 };
+
+
+
