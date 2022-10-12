@@ -36,12 +36,17 @@ exports.getUsers = (req, res, next) => {
 };
 
 exports.patchReview = (req, res, next) => {
-  console.log(req.params.review_id, req.query, "in the controllers")
-  updateReview(req.params.review_id)
-    .then((data) => {
-      res.status(200).send(data);
-    })
-    .catch((err) => {
-      next(err);
-    });
+  if(Object.keys(req.body).length !==0 ){
+    const review_id = req.params.review_id;
+    const {inc_votes} = req.body
+    updateReview(review_id, inc_votes)
+      .then((data) => {
+        res.status(200).send(data);
+      })
+      .catch((err) => {
+        next(err);
+      });
+  } else {
+    res.status(400).send({ msg: "no input detected" });
+  }
 };
