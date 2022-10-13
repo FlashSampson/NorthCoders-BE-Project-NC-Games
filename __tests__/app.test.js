@@ -21,6 +21,7 @@ describe("Error handling", () => {
           expect(body.msg).toBe("invalid input");
         });
     });
+
     test("should respond with an error if empty object passed in", () => {
       return request(app)
         .patch("/api/reviews/3")
@@ -93,7 +94,29 @@ describe("API happy path testing", () => {
           });
       });
 
-      test("response should be a review object which should have the properties: review_id, title, review_body, designer, review_img_url, votes, category, owner, created_at", () => {
+      // test("A review reposnse object should should also now include comment_count which is the total count of all the comments with this review_id ", () => {
+      //   return request(app)
+      //     .get("/api/reviews/1")
+      //     .then(({ body: review }) => {
+      //       expect(typeof review).toBe("object");
+      //       expect(review).toEqual({
+      //         review_id: 1,
+      //         title: "Agricola",
+      //         category: "euro game",
+      //         designer: "Uwe Rosenberg",
+      //         owner: "mallionaire",
+      //         review_body: "Farmyard fun!",
+      //         review_img_url:
+      //           "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+      //         created_at: "2021-01-18T10:00:20.514Z",
+      //         votes: 1,
+      //         comment_count: 0
+      //       });
+      //     });
+      // });
+
+      test(`The response should be a review object which should have the properties: review_id, title, review_body, designer, review_img_url, votes, 
+      category, owner, created_at and comment_count`, () => {
         return request(app)
           .get("/api/reviews/1")
           .then(({ body: review }) => {
@@ -109,6 +132,7 @@ describe("API happy path testing", () => {
                 "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
               created_at: "2021-01-18T10:00:20.514Z",
               votes: 1,
+              comment_count: 0,
             });
           });
       });
