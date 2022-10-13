@@ -158,6 +158,13 @@ describe("API happy path testing", () => {
       });
     });
 
+    describe('GET /api/reviews/:review_id/comments', () => {
+      test(`Should respond with an array of comments for the given review_id of which each comment should have the following properties:
+      comment_id, votes, created_at, author, body, review_id`, () => {
+        return request(app).get('/api/reviews/:review_id/comments')
+      });
+    });
+
     describe("PATCH /api/reviews/:review_id", () => {
       test("request body accepts object in correct format and should respond with updated review object", () => {
         return request(app)

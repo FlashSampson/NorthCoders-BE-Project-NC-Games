@@ -3,6 +3,7 @@ const {
   fetchReviews,
   fetchUsers,
   updateReview,
+  fetchComments
 } = require("./model");
 
 exports.getCategories = (req, res, next) => {
@@ -39,6 +40,17 @@ exports.patchReview = (req, res, next) => {
   const review_id = req.params.review_id;
   const { inc_votes } = req.body;
   updateReview(review_id, inc_votes)
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getComments = (req, res, next) => {
+  const { review_id } = req.params;
+  fetchComments(review_id)
     .then((data) => {
       res.status(200).send(data);
     })

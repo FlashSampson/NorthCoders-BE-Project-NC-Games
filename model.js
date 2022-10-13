@@ -34,3 +34,11 @@ exports.updateReview = (review_id, inc_votes) => {
       return updatedReview;
     });
 };
+
+exports.fetchComments = (review_id) => {
+  return db
+    .query(`SELECT * FROM reviews WHERE review_id = $1;`, [review_id])
+    .then(({ rows: review }) => {
+      return review[0];
+    });
+};
