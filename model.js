@@ -29,8 +29,7 @@ exports.updateReview = (review_id, inc_votes) => {
     )
     .then(({ rows: updatedReview }) => {
       if (updatedReview.length === 0) {
-        console.log(updatedReview.length, 'model')
-        Promise.reject({ status: 400, msg: "invalid input" });
+        return Promise.reject({ status: 404, msg: "not found" });
       }
       return updatedReview;
     });

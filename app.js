@@ -27,12 +27,13 @@ app.use((err, req, res, next) => {
   } else if (err.code === "23502") {
     res.status(400).send({ msg: "no input detected" });
   } else {
-    next();
+    next(err);
   }
 });
 
 app.use((err, req, res, next) => {
   if (err.status) {
+
     res.status(err.status).send({ msg: err.msg });
   } else {
     next(err);

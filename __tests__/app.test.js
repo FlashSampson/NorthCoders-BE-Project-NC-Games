@@ -31,13 +31,13 @@ describe("Error handling", () => {
         });
     });
 
-    test.only("should respond with an error non existent ID provided", () => {
+    test("should respond with an error non existent ID provided", () => {
       return request(app)
         .patch("/api/reviews/1000")
-        .send({inc_votes: 10})
-        .expect(400)
+        .send({ inc_votes: 10 })
+        .expect(404)
         .then(({ body }) => {
-          expect(body.msg).toBe("invalid input");
+          expect(body.msg).toBe("not found");
         });
     });
 
