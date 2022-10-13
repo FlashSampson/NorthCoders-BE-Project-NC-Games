@@ -1,3 +1,4 @@
+const { rows } = require("pg/lib/defaults");
 const db = require("./db/connection");
 
 exports.fetchCategories = () => {
@@ -21,16 +22,16 @@ exports.fetchUsers = () => {
 };
 
 exports.updateReview = (review_id, inc_votes) => {
-  if (typeof inc_votes !== "number") {
-    Promise.reject({ status: 400, msg: "invalid input" });
-  } else {
-    return db
-      .query(
-        `UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING*`,
-        [inc_votes, review_id]
-      )
-      .then(({ rows: updatedReview }) => {
-        return updatedReview;
-      });
-  }
+  return db
+    .query(
+      `UPDATE reviews SET votes = votes + $1 WHERE review_id = $2 RETURNING*`,
+      [inc_votes, review_id]
+    )
+    .then(({ rows: updatedReview }) => {
+      if (updatedReview.length === 0) {
+        console.log(updatedReview.length, 'model')
+        Promise.reject({ status: 400, msg: "invalid input" });
+      }
+      return updatedReview;
+    });
 };

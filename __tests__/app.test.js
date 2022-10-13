@@ -12,12 +12,13 @@ afterAll(() => {
 
 describe("Error handling", () => {
   describe("PATCH error handling - invalid data type", () => {
-    test.only("should respond with 400 error if invalid input recieved", () => {
+    test("should respond with 400 error if invalid input recieved", () => {
       return request(app)
         .patch("/api/reviews/3")
         .send({ inc_votes: "bananas" })
         .expect(400)
         .then(({ body }) => {
+          console.log(body.msg, 'test')
           expect(body.msg).toBe("invalid input");
         });
     });
@@ -30,6 +31,18 @@ describe("Error handling", () => {
           expect(body.msg).toBe("no input detected");
         });
     });
+
+    test.only("should respond with an error non existent ID provided", () => {
+      return request(app)
+        .patch("/api/reviews/1000")
+        .send({inc_votes: 10})
+        .expect(400)
+        .then(({ body }) => {
+          console.log(body.rows, 'model')
+          expect(body.msg).toBe("invalid input");
+        });
+    });
+
     describe("GET error handling", () => {
       test("should respond with 400 error if invalid input recieved", () => {
         return request(app)
