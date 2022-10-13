@@ -18,7 +18,6 @@ describe("Error handling", () => {
         .send({ inc_votes: "bananas" })
         .expect(400)
         .then(({ body }) => {
-          console.log(body.msg, 'test')
           expect(body.msg).toBe("invalid input");
         });
     });
@@ -38,7 +37,6 @@ describe("Error handling", () => {
         .send({inc_votes: 10})
         .expect(400)
         .then(({ body }) => {
-          console.log(body.rows, 'model')
           expect(body.msg).toBe("invalid input");
         });
     });
