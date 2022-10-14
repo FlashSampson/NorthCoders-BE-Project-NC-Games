@@ -42,27 +42,7 @@ describe("Error handling", () => {
         });
     });
 
-    describe("GET comments error handling", () => {
-      test("should respond with an error if an invalid review ID is provided  ", () => {
-        return request(app)
-          .get("/api/reviews/non_existent/comments")
-          .expect(400)
-          .then(({ body }) => {
-            expect(body.msg).toBe("invalid input");
-          });
-      });
-
-      test("should respond with an error if a non existent review ID is provided  ", () => {
-        return request(app)
-          .get("/api/reviews/1000/comments")
-          .expect(404)
-          .then(({ body }) => {
-            expect(body.msg).toBe("not found");
-          });
-      });
-    });
-
-    describe("GET query error handling", () => {
+    describe("GET reviews query error handling", () => {
       test("should respond with no matching results if category doesnt exist", () => {
         return request(app)
           .get("/api/reviews?category=non_existent")
