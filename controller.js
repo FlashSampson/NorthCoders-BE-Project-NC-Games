@@ -1,9 +1,12 @@
 const {
   fetchCategories,
+  fetchReviewsByID,
   fetchReviews,
   fetchUsers,
   updateReview,
 } = require("./model");
+
+const { checkIfCategoryExists } = require("./utils");
 
 exports.getCategories = (req, res, next) => {
   fetchCategories()
@@ -15,9 +18,9 @@ exports.getCategories = (req, res, next) => {
     });
 };
 
-exports.getReviews = (req, res, next) => {
+exports.getReviewsByID = (req, res, next) => {
   const { review_id } = req.params;
-  fetchReviews(review_id)
+  fetchReviewsByID(review_id)
     .then((data) => {
       res.status(200).send(data);
     })
@@ -39,6 +42,22 @@ exports.patchReview = (req, res, next) => {
   const review_id = req.params.review_id;
   const { inc_votes } = req.body;
   updateReview(review_id, inc_votes)
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getReviews = (req, res, next) => {
+  const { category: filter } = req.query;
+  if (filter) {
+    checkIfCategoryExists(filter).catch((err) => {
+      next(err);
+    });
+  }
+  fetchReviews(filter)
     .then((data) => {
       res.status(200).send(data);
     })

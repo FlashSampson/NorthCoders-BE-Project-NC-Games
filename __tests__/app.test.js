@@ -42,6 +42,17 @@ describe("Error handling", () => {
         });
     });
 
+    describe("GET query error handling", () => {
+      test("should respond with no matching results if category doesnt exist", () => {
+        return request(app)
+          .get("/api/reviews?category=non_existent")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("no matching results");
+          });
+      });
+    });
+
     describe("GET error handling", () => {
       test("should respond with 400 error if invalid input recieved", () => {
         return request(app)
@@ -93,27 +104,6 @@ describe("API happy path testing", () => {
             expect(typeof review).toBe("object");
           });
       });
-
-      // test("A review reposnse object should should also now include comment_count which is the total count of all the comments with this review_id ", () => {
-      //   return request(app)
-      //     .get("/api/reviews/1")
-      //     .then(({ body: review }) => {
-      //       expect(typeof review).toBe("object");
-      //       expect(review).toEqual({
-      //         review_id: 1,
-      //         title: "Agricola",
-      //         category: "euro game",
-      //         designer: "Uwe Rosenberg",
-      //         owner: "mallionaire",
-      //         review_body: "Farmyard fun!",
-      //         review_img_url:
-      //           "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-      //         created_at: "2021-01-18T10:00:20.514Z",
-      //         votes: 1,
-      //         comment_count: 0
-      //       });
-      //     });
-      // });
 
       test(`The response should be a review object which should have the properties: review_id, title, review_body, designer, review_img_url, votes, 
       category, owner, created_at and comment_count`, () => {
@@ -175,6 +165,64 @@ describe("API happy path testing", () => {
                 name: "dave",
                 avatar_url:
                   "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+              },
+            ]);
+          });
+      });
+    });
+
+    describe("GET /api/reviews", () => {
+      test(`Should respond with a reviews array of review objects, each of which should have the following properties:
+      owner, title, review_id, category, review_img_url, created_at, votes, designer, comment count`, () => {
+        return request(app)
+          .get(`/api/reviews`)
+          .expect(200)
+          .then(({ body: reviews }) => {
+            expect(reviews.length).toBe(13);
+            expect(Array.isArray(reviews)).toBe(true);
+            expect(reviews[0]).toEqual({
+              owner: "mallionaire",
+              review_id: 7,
+              title: "Mollit elit qui incididunt veniam occaecat cupidatat",
+              category: "social deduction",
+              designer: "Avery Wunzboogerz",
+              review_body:
+                "Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.",
+              review_img_url:
+                "https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
+              created_at: "2021-01-25T11:16:54.963Z",
+              votes: 9,
+              comment_count: "0",
+            });
+          });
+      });
+      test("Reviews should be sorted by date in descending order", () => {
+        return request(app)
+          .get("/api/reviews")
+          .expect(200)
+          .then(({ body: reviews }) => {
+            expect(reviews).toBeSortedBy("created_at", { descending: true });
+          });
+      });
+
+      test(`should accept category query, which filters the reviews by the category value specified in the query. If the query is omitted the endpoint should respond with all reviews.`, () => {
+        return request(app)
+          .get("/api/reviews?category=dexterity")
+          .expect(200)
+          .then(({ body: reviews }) => {
+            expect(reviews).toEqual([
+              {
+                owner: "philippaclaire9",
+                review_id: 2,
+                title: "Jenga",
+                category: "dexterity",
+                designer: "Leslie Scott",
+                review_body: "Fiddly fun for all the family",
+                review_img_url:
+                  "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+                created_at: "2021-01-18T10:01:41.251Z",
+                votes: 5,
+                comment_count: "3",
               },
             ]);
           });
