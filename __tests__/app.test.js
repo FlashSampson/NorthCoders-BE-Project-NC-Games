@@ -43,10 +43,10 @@ describe("Error handling", () => {
     });
 
     describe("GET query error handling", () => {
-      test.only("should respond with no matching results if category doesnt exist", () => {
+      test("should respond with no matching results if category doesnt exist", () => {
         return request(app)
           .get("/api/reviews?category=non_existent")
-          .expect(400)
+          .expect(404)
           .then(({ body }) => {
             expect(body.msg).toBe("no matching results");
           });
@@ -180,7 +180,6 @@ describe("API happy path testing", () => {
           .then(({ body: reviews }) => {
             expect(reviews.length).toBe(13);
             expect(Array.isArray(reviews)).toBe(true);
-            // console.log(reviews[0])
             expect(reviews[0]).toEqual({
               owner: "mallionaire",
               review_id: 7,

@@ -4,8 +4,9 @@ const {
   fetchReviews,
   fetchUsers,
   updateReview,
-  
 } = require("./model");
+
+const { checkIfCategoryExists } = require("./utils");
 
 exports.getCategories = (req, res, next) => {
   fetchCategories()
@@ -49,9 +50,13 @@ exports.patchReview = (req, res, next) => {
     });
 };
 
-
 exports.getReviews = (req, res, next) => {
-  const {category:filter} = req.query
+  const { category: filter } = req.query;
+  if (filter) {
+    checkIfCategoryExists(filter).catch((err) => {
+      next(err);
+    });
+  }
   fetchReviews(filter)
     .then((data) => {
       res.status(200).send(data);

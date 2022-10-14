@@ -1,6 +1,5 @@
 const { rows } = require("pg/lib/defaults");
 const db = require("./db/connection");
-const {checkIfCategoryExists} = require('./utils')
 
 exports.fetchCategories = () => {
   return db.query(`SELECT * FROM categories;`).then(({ rows: categories }) => {
@@ -48,31 +47,18 @@ exports.updateReview = (review_id, inc_votes) => {
 };
 
 exports.fetchReviews = (filter) => {
-  
   let queryString = `SELECT users.username AS owner, reviews.* , COUNT(comments.review_id) comment_count
 FROM reviews
 LEFT JOIN comments ON reviews.review_id = comments.review_id
-LEFT JOIN users ON reviews.owner = users.username`
+LEFT JOIN users ON reviews.owner = users.username`;
 
   if (filter) {
-      checkIfCategoryExists(filter).then((filter)=>{
-        console.log(queryString, 'model')
-        return queryString += ` WHERE category = '${filter}'`;
-      })
-    
-    // const acceptableValues = [" social deduction", "dexterity", "euro game"];
-
-    // if (!acceptableValues.includes(filter)) {
-    //   return Promise.reject({ status: 400, msg: "Invalid input recieved" });
-    // }
-
-    // queryString += ` WHERE category = '${filter}'`;
+    queryString += ` WHERE category = '${filter}'`;
   }
   queryString += ` GROUP BY reviews.review_id, comments.review_id, users.username
   ORDER BY created_at DESC;`;
 
   return db.query(queryString).then(({ rows: reviews }) => {
-    
     return reviews;
   });
 };
