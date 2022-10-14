@@ -69,6 +69,9 @@ exports.getReviews = (req, res, next) => {
 
 exports.getComments = (req, res, next) => {
   const { review_id } = req.params;
+  fetchReviewsByID(review_id).catch((err)=>{
+    next(err)
+  })
   fetchComments(review_id)
     .then((data) => {
       res.status(200).send(data);

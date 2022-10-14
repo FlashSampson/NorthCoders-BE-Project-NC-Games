@@ -8,22 +8,18 @@ exports.fetchCategories = () => {
 };
 
 exports.fetchReviewsByID = (review_id) => {
-  return (
-    db
-      .query(
-        `SELECT reviews.* , COUNT(comments.review_id) ::INT AS comment_count
+  return db
+    .query(
+      `SELECT reviews.* , COUNT(comments.review_id) ::INT AS comment_count
   FROM reviews
   LEFT JOIN comments ON reviews.review_id = comments.review_id
   WHERE reviews.review_id = $1
   GROUP BY reviews.review_id, comments.review_id;`,
-        [review_id]
-      )
-
-      // .query(`SELECT * FROM reviews WHERE review_id = $1;`, [review_id])
-      .then(({ rows: review }) => {
-        return review[0];
-      })
-  );
+      [review_id]
+    )
+    .then(({ rows: review }) => {
+      return review[0];
+    });
 };
 
 exports.fetchUsers = () => {
@@ -53,12 +49,13 @@ LEFT JOIN comments ON reviews.review_id = comments.review_id
 LEFT JOIN users ON reviews.owner = users.username`;
 
   if (filter) {
-    queryString += ` WHERE category = $1
+    (queryString += ` WHERE category = $1
     GROUP BY reviews.review_id, comments.review_id, users.username
-  ORDER BY created_at DESC;`, [filter];
-  return db.query(queryString, [filter]).then(({ rows: reviews }) => {
-    return reviews;
-  });
+  ORDER BY created_at DESC;`),
+      [filter];
+    return db.query(queryString, [filter]).then(({ rows: reviews }) => {
+      return reviews;
+    });
   }
   queryString += ` GROUP BY reviews.review_id, comments.review_id, users.username
   ORDER BY created_at DESC;`;

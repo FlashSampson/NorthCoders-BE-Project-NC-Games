@@ -42,8 +42,8 @@ describe("Error handling", () => {
         });
     });
 
-    describe('Get comments err handling', () => {
-      test('should respond with 404 err results if review doesnt exist', () => {
+    describe("Get comments err handling", () => {
+      test("should check review exists before invoking model", () => {
         return request(app)
           .get("/api/reviews/1000/comments")
           .expect(404)
@@ -52,7 +52,7 @@ describe("Error handling", () => {
           });
       });
 
-      test('should respond with err code if 400 invalid review_id provided', () => {
+      test("should respond with err code if 400 invalid review_id provided", () => {
         return request(app)
           .get("/api/reviews/fish/comments")
           .expect(400)
