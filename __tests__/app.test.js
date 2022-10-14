@@ -273,4 +273,33 @@ describe("API happy path testing", () => {
         });
     });
   });
+  describe("POST /api/reviews/:review_id/comments", () => {
+    test(`Request body accepts an object with the properties username and body`, () => {
+      const newComment = {
+        username: "bainesface",
+        body: "What a next level game, best thing since Metal Gear Solid",
+      };
+      return request(app)
+        .post("/api/reviews/4/comments")
+        .expect(201)
+        .send(newComment)
+        .then(({ body: comment  }) => {
+          console.log(comment, 'test');
+          expect(Array.isArray(comment)).toBe(true);
+          comment.forEach((comment) => {
+            expect(Object.keys(comment)).toHaveLength(6);
+            expect(comment).toEqual(
+              expect.objectContaining({
+                comment_id: expect.any(Number),
+                body: expect.any(String),
+                review_id: expect.any(Number),
+                author: expect.any(String),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+              })
+            );
+          });
+        });
+    });
+  });
 });

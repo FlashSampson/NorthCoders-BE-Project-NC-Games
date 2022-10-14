@@ -5,7 +5,8 @@ const {
   getReviewsByID,
   getUsers,
   patchReview,
-  getReviews
+  getReviews,
+  postComment
 } = require("./controller");
 
 app.use(express.json());
@@ -19,6 +20,8 @@ app.get(`/api/reviews`, getReviews)
 app.get("/api/users", getUsers);
 
 app.patch("/api/reviews/:review_id", patchReview);
+
+app.post("/api/reviews/:review_id/comments", postComment);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "route not found" });

@@ -53,12 +53,13 @@ LEFT JOIN comments ON reviews.review_id = comments.review_id
 LEFT JOIN users ON reviews.owner = users.username`;
 
   if (filter) {
-    queryString += ` WHERE category = $1
+    (queryString += ` WHERE category = $1
     GROUP BY reviews.review_id, comments.review_id, users.username
-  ORDER BY created_at DESC;`, [filter];
-  return db.query(queryString, [filter]).then(({ rows: reviews }) => {
-    return reviews;
-  });
+  ORDER BY created_at DESC;`),
+      [filter];
+    return db.query(queryString, [filter]).then(({ rows: reviews }) => {
+      return reviews;
+    });
   }
   queryString += ` GROUP BY reviews.review_id, comments.review_id, users.username
   ORDER BY created_at DESC;`;
@@ -66,4 +67,16 @@ LEFT JOIN users ON reviews.owner = users.username`;
   return db.query(queryString).then(({ rows: reviews }) => {
     return reviews;
   });
+};
+
+exports.insertComment = (newComment, review_id) => {
+  const { username, body } = newComment;
+  return db
+    .query(
+      `INSERT INTO comments (author, body, review_id) VALUES($1, $2, $3) RETURNING *;`,
+      [username, body, review_id]
+    )
+    .then(({ rows: comment }) => {
+      return comment;
+    });
 };
