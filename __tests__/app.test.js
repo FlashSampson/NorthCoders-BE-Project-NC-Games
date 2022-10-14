@@ -52,7 +52,7 @@ describe("Error handling", () => {
           });
       });
 
-      test.only("should respond with an error if a non existent review ID is provided  ", () => {
+      test("should respond with an error if a non existent review ID is provided  ", () => {
         return request(app)
           .get("/api/reviews/1000/comments")
           .expect(404)
