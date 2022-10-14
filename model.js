@@ -53,7 +53,12 @@ LEFT JOIN comments ON reviews.review_id = comments.review_id
 LEFT JOIN users ON reviews.owner = users.username`;
 
   if (filter) {
-    queryString += ` WHERE category = '${filter}'`;
+    queryString += ` WHERE category = $1
+    GROUP BY reviews.review_id, comments.review_id, users.username
+  ORDER BY created_at DESC;`, [filter];
+  return db.query(queryString, [filter]).then(({ rows: reviews }) => {
+    return reviews;
+  });
   }
   queryString += ` GROUP BY reviews.review_id, comments.review_id, users.username
   ORDER BY created_at DESC;`;

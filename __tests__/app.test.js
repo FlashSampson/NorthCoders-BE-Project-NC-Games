@@ -42,7 +42,7 @@ describe("Error handling", () => {
         });
     });
 
-    describe("GET query error handling", () => {
+    describe("GET reviews query error handling", () => {
       test("should respond with no matching results if category doesnt exist", () => {
         return request(app)
           .get("/api/reviews?category=non_existent")
