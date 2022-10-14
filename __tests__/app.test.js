@@ -42,6 +42,27 @@ describe("Error handling", () => {
         });
     });
 
+    describe('Get comments err handling', () => {
+      test('should respond with 404 err results if review doesnt exist', () => {
+        return request(app)
+          .get("/api/reviews/1000/comments")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("not found");
+          });
+      });
+
+      test('should respond with err code if 400 invalid review_id provided', () => {
+        return request(app)
+          .get("/api/reviews/fish/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("invalid input");
+          });
+      });
+
+    });
+
     describe("GET reviews query error handling", () => {
       test("should respond with no matching results if category doesnt exist", () => {
         return request(app)
