@@ -42,6 +42,27 @@ describe("Error handling", () => {
         });
     });
 
+    describe("Get comments err handling", () => {
+      test("should check review exists before invoking model", () => {
+        return request(app)
+          .get("/api/reviews/1000/comments")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("not found");
+          });
+      });
+
+      test("should respond with err code if 400 invalid review_id provided", () => {
+        return request(app)
+          .get("/api/reviews/fish/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("invalid input");
+          });
+      });
+
+    });
+
     describe("GET reviews query error handling", () => {
       test("should respond with no matching results if category doesnt exist", () => {
         return request(app)
@@ -225,6 +246,38 @@ describe("API happy path testing", () => {
                 comment_count: "3",
               },
             ]);
+          });
+      });
+    });
+
+    describe("GET /api/reviews/:review_id/comments", () => {
+      test(`Should respond with array of an array of comments for the given review_id of which each comment 
+  should have the following properties: comment_id, votes, created_at, author, body, review_id`, () => {
+        return request(app)
+          .get("/api/reviews/3/comments")
+          .then(({ body: comments }) => {
+            comments.forEach((comment) => {
+              expect(Object.keys(comment)).toHaveLength(6);
+              expect(comment).toEqual(
+                expect.objectContaining({
+                  comment_id: expect.any(Number),
+                  body: expect.any(String),
+                  review_id: expect.any(Number),
+                  author: expect.any(String),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+                })
+              );
+            });
+          });
+      });
+
+      test("Comments should be served with the most recent comments first ", () => {
+        return request(app)
+          .get("/api/reviews/3/comments")
+          .expect(200)
+          .then(({ body: comments }) => {
+            expect(comments).toBeSortedBy("created_at", { descending: true });
           });
       });
     });
