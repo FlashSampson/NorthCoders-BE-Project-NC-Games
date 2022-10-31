@@ -1,3 +1,5 @@
+
+const cors = require('cors');
 const express = require("express");
 const app = express();
 const {
@@ -8,6 +10,8 @@ const {
   getReviews,
   postComment
 } = require("./controller");
+
+app.use(cors());
 
 app.use(express.json());
 
@@ -47,7 +51,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err)
+  // console.log(err)
   res.status(500).send({ msg: "Oops server broke :(" });
 });
 
