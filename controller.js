@@ -52,13 +52,15 @@ exports.patchReview = (req, res, next) => {
 };
 
 exports.getReviews = (req, res, next) => {
-  const { category: filter } = req.query;
+  const { category: filter, sortBy: sortQuery} = req.query;
+ 
   if (filter) {
     checkIfCategoryExists(filter).catch((err) => {
       next(err);
     });
-  }
-  fetchReviews(filter)
+  } 
+
+  fetchReviews(filter, sortQuery)
     .then((data) => {
       res.status(200).send(data);
     })
@@ -72,6 +74,7 @@ exports.postComment = (req, res, next) => {
 
   insertComment(req.body, review_id)
     .then((data) => {
+      const comment = data[0].body
       res.status(201).send(data);
     })
     .catch((err) => {

@@ -11,6 +11,36 @@ afterAll(() => {
 });
 
 describe("Error handling", () => {
+  describe("POST error handling - invalid data type", () => {
+    test("should respond with 400 error if empty input recieved", () => {
+      const newComment = {
+        username: 21,
+        body: 69,
+      };
+      return request(app)
+        .post("/api/reviews/:review_id/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid input");
+        });
+    });
+
+    test("should respond with 400 error if empty input recieved", () => {
+      const newComment = {
+        username: "",
+        body: "",
+      };
+      return request(app)
+        .post("/api/reviews/:review_id/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid input");
+        });
+    });
+  });
+
   describe("PATCH error handling - invalid data type", () => {
     test("should respond with 400 error if invalid input recieved", () => {
       return request(app)
@@ -178,24 +208,30 @@ describe("API happy path testing", () => {
           .get(`/api/reviews`)
           .expect(200)
           .then(({ body: reviews }) => {
-            expect(reviews.length).toBe(13);
-            expect(Array.isArray(reviews)).toBe(true);
-            expect(reviews[0]).toEqual({
-              owner: "mallionaire",
-              review_id: 7,
-              title: "Mollit elit qui incididunt veniam occaecat cupidatat",
-              category: "social deduction",
-              designer: "Avery Wunzboogerz",
-              review_body:
-                "Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.",
-              review_img_url:
-                "https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-              created_at: "2021-01-25T11:16:54.963Z",
-              votes: 9,
-              comment_count: "0",
+              expect(Array.isArray(reviews)).toBe(true);
+              reviews.forEach((review) => {
+                expect(Object.keys(review)).toHaveLength(10);
+                expect(review).toEqual(
+                  expect.objectContaining({
+                    owner: expect.any(String),
+                    review_id: expect.any(Number),
+                    title: expect.any(String),
+                    category: expect.any(String),
+                    designer: expect.any(String),
+                    review_body: expect.any(String),
+                    review_img_url: expect.any(String),
+                    created_at: expect.any(String),
+                    votes: expect.any(Number),
+                    comment_count: expect.any(String)
+                  })
+                );
+              });
             });
           });
-      });
+      
+
+
+
       test("Reviews should be sorted by date in descending order", () => {
         return request(app)
           .get("/api/reviews")
@@ -227,7 +263,13 @@ describe("API happy path testing", () => {
             ]);
           });
       });
+
+      test(`should accept sort_by query, which sorts the articles by any valid column (defaults to date)
+and an order, which can be set to ascending or descending `, () => {
+        return request(app).get("/api/reviews?category=dexterity&sortBy=poo").expect(400);
+      });
     });
+
 
     describe("PATCH /api/reviews/:review_id", () => {
       test("request body accepts object in correct format and should respond with updated review object", () => {
@@ -283,8 +325,7 @@ describe("API happy path testing", () => {
         .post("/api/reviews/4/comments")
         .expect(201)
         .send(newComment)
-        .then(({ body: comment  }) => {
-          console.log(comment, 'test');
+        .then(({ body: comment }) => {
           expect(Array.isArray(comment)).toBe(true);
           comment.forEach((comment) => {
             expect(Object.keys(comment)).toHaveLength(6);

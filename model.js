@@ -1,5 +1,6 @@
 const { rows } = require("pg/lib/defaults");
 const db = require("./db/connection");
+const { sort } = require("./db/data/test-data/categories");
 
 exports.fetchCategories = () => {
   return db.query(`SELECT * FROM categories;`).then(({ rows: categories }) => {
@@ -46,25 +47,24 @@ exports.updateReview = (review_id, inc_votes) => {
     });
 };
 
-exports.fetchReviews = (filter) => {
+exports.fetchReviews = (filter, sortQuery= 'created_at') => {
   let queryString = `SELECT users.username AS owner, reviews.* , COUNT(comments.review_id) comment_count
-FROM reviews
-LEFT JOIN comments ON reviews.review_id = comments.review_id
-LEFT JOIN users ON reviews.owner = users.username`;
+    FROM reviews
+    LEFT JOIN comments ON reviews.review_id = comments.review_id
+    LEFT JOIN users ON reviews.owner = users.username`;
 
   if (filter) {
-    (queryString += ` WHERE category = $1
-    GROUP BY reviews.review_id, comments.review_id, users.username
-  ORDER BY created_at DESC;`),
-      [filter];
+    queryString += ` WHERE category = $1 GROUP BY reviews.review_id, comments.review_id, users.username
+    ORDER BY created_at DESC `;
+
     return db.query(queryString, [filter]).then(({ rows: reviews }) => {
       return reviews;
     });
   }
-  queryString += ` GROUP BY reviews.review_id, comments.review_id, users.username
-  ORDER BY created_at DESC;`;
 
-  return db.query(queryString).then(({ rows: reviews }) => {
+  queryString += ` GROUP BY reviews.review_id, comments.review_id, users.username ORDER BY $1 DESC;`;
+
+  return db.query(queryString, [sortQuery]).then(({ rows: reviews }) => {
     return reviews;
   });
 };
