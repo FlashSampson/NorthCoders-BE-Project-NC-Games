@@ -5,6 +5,7 @@ const {
   fetchUsers,
   updateReview,
   insertComment,
+  fetchComments
 } = require("./model");
 
 const { checkIfCategoryExists } = require("./utils");

@@ -7,11 +7,8 @@ const {
   getReviewsByID,
   getUsers,
   patchReview,
-  getReviews,
-  postComment
+  getReviews
 } = require("./controller");
-
-app.use(cors());
 
 app.use(express.json());
 
@@ -19,9 +16,13 @@ app.get("/api/categories", getCategories);
 
 app.get("/api/reviews/:review_id", getReviewsByID);
 
-app.get(`/api/reviews`, getReviews)
+app.get(`/api/reviews`, getReviews);
+
+app.get(`/api/reviews/:review_id/comments,`, getComments)
 
 app.get("/api/users", getUsers);
+
+app.get("/api/reviews/:review_id/comments", getComments);
 
 app.patch("/api/reviews/:review_id", patchReview);
 
@@ -43,7 +44,6 @@ app.use((err, req, res, next) => {
 
 app.use((err, req, res, next) => {
   if (err.status) {
-
     res.status(err.status).send({ msg: err.msg });
   } else {
     next(err);

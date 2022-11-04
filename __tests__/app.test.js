@@ -72,6 +72,27 @@ describe("Error handling", () => {
         });
     });
 
+    describe("Get comments err handling", () => {
+      test("should check review exists before invoking model", () => {
+        return request(app)
+          .get("/api/reviews/1000/comments")
+          .expect(404)
+          .then(({ body }) => {
+            expect(body.msg).toBe("not found");
+          });
+      });
+
+      test("should respond with err code if 400 invalid review_id provided", () => {
+        return request(app)
+          .get("/api/reviews/fish/comments")
+          .expect(400)
+          .then(({ body }) => {
+            expect(body.msg).toBe("invalid input");
+          });
+      });
+
+    });
+
     describe("GET reviews query error handling", () => {
       test("should respond with no matching results if category doesnt exist", () => {
         return request(app)
@@ -234,10 +255,11 @@ describe("API happy path testing", () => {
 
       test("Reviews should be sorted by date in descending order", () => {
         return request(app)
-          .get("/api/reviews")
+          .patch("/api/reviews/3")
+          .send({ inc_votes: 1 })
           .expect(200)
-          .then(({ body: reviews }) => {
-            expect(reviews).toBeSortedBy("created_at", { descending: true });
+          .then(({ body }) => {
+            expect(body[0].votes).toBe(6);
           });
       });
 
@@ -263,35 +285,20 @@ describe("API happy path testing", () => {
             ]);
           });
       });
-
-      test(`should accept sort_by query, which sorts the articles by any valid column (defaults to date)
-and an order, which can be set to ascending or descending `, () => {
-        return request(app).get("/api/reviews?category=dexterity&sortBy=poo").expect(400);
-      });
     });
-
 
     describe("PATCH /api/reviews/:review_id", () => {
       test("request body accepts object in correct format and should respond with updated review object", () => {
         return request(app)
-          .patch("/api/reviews/3")
-          .send({ inc_votes: 1 })
+          .patch("/api/reviews/13")
+          .send({ inc_votes: 6 })
           .expect(200)
           .then(({ body }) => {
-            expect(body[0]).toEqual({
-              review_id: 3,
-              title: "Ultimate Werewolf",
-              category: "social deduction",
-              designer: "Akihisa Okui",
-              owner: "bainesface",
-              review_body: "We couldn't find the werewolf!",
-              review_img_url:
-                "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-              created_at: "2021-01-18T10:01:41.251Z",
-              votes: 6,
-            });
+            expect(body[0].votes).toBe(22);
           });
       });
+
+
     });
 
     test("should accept negative numbers and decrement reviews by input value  ", () => {
