@@ -323,7 +323,7 @@ describe("API happy path testing", () => {
     });
   });
   describe("POST /api/reviews/:review_id/comments", () => {
-    test(`Request body accepts an object with the properties username and body`, () => {
+    test.only(`Request body accepts an object with the properties username and body`, () => {
       const newComment = {
         username: "bainesface",
         body: "What a next level game, best thing since Metal Gear Solid",

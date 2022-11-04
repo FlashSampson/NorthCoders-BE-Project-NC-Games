@@ -70,6 +70,17 @@ exports.getReviews = (req, res, next) => {
     });
 };
 
+exports.getComments = (req, res, next) => {
+  const { review_id } = req.params;
+  fetchComments(review_id)
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
 exports.postComment = (req, res, next) => {
   const { review_id } = req.params;
 

@@ -5,12 +5,15 @@ const app = express();
 const {
   getCategories,
   getReviewsByID,
-  getUsers,
-  patchReview,
   getReviews,
   getComments,
+  getUsers,
+  patchReview,
+  postComment
 
 } = require("./controller");
+
+app.use(cors());
 
 app.use(express.json());
 

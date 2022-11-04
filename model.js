@@ -8,6 +8,12 @@ exports.fetchCategories = () => {
   });
 };
 
+exports.fetchComments= () => {
+  return db.query(`SELECT * FROM comments;`).then(({ rows: comments }) => {
+    return comments;
+  });
+};
+
 exports.fetchReviewsByID = (review_id) => {
   return db
     .query(
