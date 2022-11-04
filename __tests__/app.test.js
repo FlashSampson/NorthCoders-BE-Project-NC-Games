@@ -289,20 +289,22 @@ describe("API happy path testing", () => {
           .send({ inc_votes: 1 })
           .expect(200)
           .then(({ body }) => {
-            expect(body[0]).toEqual({
-              review_id: 3,
-              title: "Ultimate Werewolf",
-              category: "social deduction",
-              designer: "Akihisa Okui",
-              owner: "bainesface",
-              review_body: "We couldn't find the werewolf!",
-              review_img_url:
-                "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-              created_at: "2021-01-18T10:01:41.251Z",
-              votes: 6,
-            });
+            expect(body[0].votes).toBe(6);
           });
       });
+
+  
+      test("request body accepts object in correct format and should respond with updated review object", () => {
+        return request(app)
+          .patch("/api/reviews/13")
+          .send({ inc_votes: 6 })
+          .expect(200)
+          .then(({ body }) => {
+            expect(body[0].votes).toBe(22);
+          });
+      });
+
+
     });
 
     test("should accept negative numbers and decrement reviews by input value  ", () => {
