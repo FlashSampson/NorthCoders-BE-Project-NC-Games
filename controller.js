@@ -72,9 +72,19 @@ exports.getReviews = (req, res, next) => {
 
 exports.getComments = (req, res, next) => {
   const { review_id } = req.params;
-  fetchComments(review_id)
+
+  fetchReviewsByID(review_id).then(()=>{
+    return fetchComments(review_id)
+
+  })
+
     .then((data) => {
-      res.status(200).send(data);
+      if (data.length === 0){
+    res.status(200).send({msg:"no comment found"});
+   } else {
+     res.status(200).send(data);
+
+   }
     })
     .catch((err) => {
       next(err);
