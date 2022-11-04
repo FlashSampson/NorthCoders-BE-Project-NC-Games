@@ -1,14 +1,16 @@
-const cors = require('cors')
+
+const cors = require('cors');
 const express = require("express");
 const app = express();
 const {
   getCategories,
   getReviewsByID,
-  getUsers,
-  patchReview,
-  getComments
   getReviews,
   getComments,
+  getUsers,
+  patchReview,
+  postComment
+
 } = require("./controller");
 
 app.use(cors());
@@ -21,13 +23,15 @@ app.get("/api/reviews/:review_id", getReviewsByID);
 
 app.get(`/api/reviews`, getReviews);
 
-app.get(`/api/reviews/:review_id/comments,`, getComments)
+app.get(`/api/reviews/:review_id/comments`, getComments)
 
 app.get("/api/users", getUsers);
 
 app.get("/api/reviews/:review_id/comments", getComments);
 
 app.patch("/api/reviews/:review_id", patchReview);
+
+app.post("/api/reviews/:review_id/comments", postComment);
 
 app.all("/*", (req, res) => {
   res.status(404).send({ msg: "route not found" });
@@ -52,7 +56,7 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  console.log(err);
+  console.log(err)
   res.status(500).send({ msg: "Oops server broke :(" });
 });
 

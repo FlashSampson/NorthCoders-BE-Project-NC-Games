@@ -11,6 +11,36 @@ afterAll(() => {
 });
 
 describe("Error handling", () => {
+  describe("POST error handling - invalid data type", () => {
+    test("should respond with 400 error if empty input recieved", () => {
+      const newComment = {
+        username: 21,
+        body: 69,
+      };
+      return request(app)
+        .post("/api/reviews/:review_id/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid input");
+        });
+    });
+
+    test("should respond with 400 error if empty input recieved", () => {
+      const newComment = {
+        username: "",
+        body: "",
+      };
+      return request(app)
+        .post("/api/reviews/:review_id/comments")
+        .send(newComment)
+        .expect(400)
+        .then(({ body }) => {
+          expect(body.msg).toBe("invalid input");
+        });
+    });
+  });
+
   describe("PATCH error handling - invalid data type", () => {
     test("should respond with 400 error if invalid input recieved", () => {
       return request(app)
@@ -42,13 +72,22 @@ describe("Error handling", () => {
         });
     });
 
-    describe("Get comments err handling", () => {
+    describe("GET comments err handling", () => {
       test("should check review exists before invoking model", () => {
         return request(app)
           .get("/api/reviews/1000/comments")
           .expect(404)
           .then(({ body }) => {
-            expect(body.msg).toBe("not found");
+            expect(body.msg).toBe("review not found");
+          });
+      });
+
+      test("should respond 404 not found if no comments exist", () => {
+        return request(app)
+          .get("/api/reviews/14/comments")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.msg).toBe("no comment found");
           });
       });
 
@@ -60,7 +99,6 @@ describe("Error handling", () => {
             expect(body.msg).toBe("invalid input");
           });
       });
-
     });
 
     describe("GET reviews query error handling", () => {
@@ -192,15 +230,62 @@ describe("API happy path testing", () => {
       });
     });
 
-    describe('GET /api/reviews/:review_id/comments', () => {
-      test(`Should respond with an array of comments for the given review_id of which each comment should have the following properties:
-      comment_id, votes, created_at, author, body, review_id`, () => {
-        return request(app).get('/api/reviews/:review_id/comments')
+    describe(" GET /api/reviews/:review_id/comments", () => {
+      test.only (`Should respond with an array of comments for the given review_id of which each comment should have the following 
+      properties:
+      -comment_id
+      - votes
+      - created_at
+      - author which is the username from the users table
+      - body
+      - review_id `, () => {
+        return request(app)
+          .get(`/api/reviews/3/comments`)
+          .expect(200)
+          .then(({ body: comment }) => {
+            expect(comment).toEqual(
+              expect.objectContaining({
+                comment_id: expect.any(Number),
+                body: expect.any(String),
+                review_id: expect.any(Number),
+                author: expect.any(String),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+              })
+            );
+          });
       });
     });
 
-    describe("PATCH /api/reviews/:review_id", () => {
-      test("request body accepts object in correct format and should respond with updated review object", () => {
+    describe("GET /api/reviews", () => {
+      test(`Should respond with a reviews array of review objects, each of which should have the following properties:
+      owner, title, review_id, category, review_img_url, created_at, votes, designer, comment count`, () => {
+        return request(app)
+          .get(`/api/reviews`)
+          .expect(200)
+          .then(({ body: reviews }) => {
+            expect(Array.isArray(reviews)).toBe(true);
+            reviews.forEach((review) => {
+              expect(Object.keys(review)).toHaveLength(10);
+              expect(review).toEqual(
+                expect.objectContaining({
+                  owner: expect.any(String),
+                  review_id: expect.any(Number),
+                  title: expect.any(String),
+                  category: expect.any(String),
+                  designer: expect.any(String),
+                  review_body: expect.any(String),
+                  review_img_url: expect.any(String),
+                  created_at: expect.any(String),
+                  votes: expect.any(Number),
+                  comment_count: expect.any(String),
+                })
+              );
+            });
+          });
+      });
+
+      test("Reviews should be sorted by date in descending order", () => {
         return request(app)
           .patch("/api/reviews/3")
           .send({ inc_votes: 1 })
@@ -210,7 +295,31 @@ describe("API happy path testing", () => {
           });
       });
 
-  
+      test(`should accept category query, which filters the reviews by the category value specified in the query. If the query is omitted the endpoint should respond with all reviews.`, () => {
+        return request(app)
+          .get("/api/reviews?category=dexterity")
+          .expect(200)
+          .then(({ body: reviews }) => {
+            expect(reviews).toEqual([
+              {
+                owner: "philippaclaire9",
+                review_id: 2,
+                title: "Jenga",
+                category: "dexterity",
+                designer: "Leslie Scott",
+                review_body: "Fiddly fun for all the family",
+                review_img_url:
+                  "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+                created_at: "2021-01-18T10:01:41.251Z",
+                votes: 5,
+                comment_count: "3",
+              },
+            ]);
+          });
+      });
+    });
+
+    describe("PATCH /api/reviews/:review_id", () => {
       test("request body accepts object in correct format and should respond with updated review object", () => {
         return request(app)
           .patch("/api/reviews/13")
@@ -220,8 +329,6 @@ describe("API happy path testing", () => {
             expect(body[0].votes).toBe(22);
           });
       });
-
-
     });
 
     test("should accept negative numbers and decrement reviews by input value  ", () => {
@@ -241,6 +348,34 @@ describe("API happy path testing", () => {
               "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
             created_at: "2021-01-18T10:01:41.251Z",
             votes: -94,
+          });
+        });
+    });
+  });
+  describe("POST /api/reviews/:review_id/comments", () => {
+    test(`Request body accepts an object with the properties username and body`, () => {
+      const newComment = {
+        username: "bainesface",
+        body: "What a next level game, best thing since Metal Gear Solid",
+      };
+      return request(app)
+        .post("/api/reviews/4/comments")
+        .expect(201)
+        .send(newComment)
+        .then(({ body: comment }) => {
+          expect(Array.isArray(comment)).toBe(true);
+          comment.forEach((comment) => {
+            expect(Object.keys(comment)).toHaveLength(6);
+            expect(comment).toEqual(
+              expect.objectContaining({
+                comment_id: expect.any(Number),
+                body: expect.any(String),
+                review_id: expect.any(Number),
+                author: expect.any(String),
+                votes: expect.any(Number),
+                created_at: expect.any(String),
+              })
+            );
           });
         });
     });

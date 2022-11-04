@@ -4,6 +4,7 @@ const {
   fetchReviews,
   fetchUsers,
   updateReview,
+  insertComment,
   fetchComments
 } = require("./model");
 
@@ -45,6 +46,58 @@ exports.patchReview = (req, res, next) => {
   updateReview(review_id, inc_votes)
     .then((data) => {
       res.status(200).send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getReviews = (req, res, next) => {
+  const { category: filter, sortBy: sortQuery} = req.query;
+ 
+  if (filter) {
+    checkIfCategoryExists(filter).catch((err) => {
+      next(err);
+    });
+  } 
+
+  fetchReviews(filter, sortQuery)
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getComments = (req, res, next) => {
+  const { review_id } = req.params;
+
+  fetchReviewsByID(review_id).then(()=>{
+    return fetchComments(review_id)
+
+  })
+
+    .then((data) => {
+      if (data.length === 0){
+    res.status(200).send({msg:"no comment found"});
+   } else {
+     res.status(200).send(data);
+
+   }
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postComment = (req, res, next) => {
+  const { review_id } = req.params;
+
+  insertComment(req.body, review_id)
+    .then((data) => {
+      const comment = data[0].body
+      res.status(201).send(data);
     })
     .catch((err) => {
       next(err);
