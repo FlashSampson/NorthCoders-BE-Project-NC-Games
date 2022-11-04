@@ -42,41 +42,10 @@ exports.updateReview = (review_id, inc_votes) => {
     });
 };
 
-exports.fetchReviews = (filter) => {
-  let queryString = `SELECT users.username AS owner, reviews.* , COUNT(comments.review_id) comment_count
-FROM reviews
-LEFT JOIN comments ON reviews.review_id = comments.review_id
-LEFT JOIN users ON reviews.owner = users.username`;
-
-  if (filter) {
-    (queryString += ` WHERE category = $1
-    GROUP BY reviews.review_id, comments.review_id, users.username
-  ORDER BY created_at DESC;`),
-      [filter];
-    return db.query(queryString, [filter]).then(({ rows: reviews }) => {
-      return reviews;
-    });
-  }
-  queryString += ` GROUP BY reviews.review_id, comments.review_id, users.username
-  ORDER BY created_at DESC;`;
-
-  return db.query(queryString).then(({ rows: reviews }) => {
-    return reviews;
-  });
-};
-
 exports.fetchComments = (review_id) => {
   return db
-    .query(
-      `SELECT * FROM comments
-  WHERE review_id = $1
-  ORDER BY created_at DESC;`,
-      [review_id]
-    )
-    .then(({ rows: comments }) => {
-      if (comments.length === 0) {
-        return Promise.reject({ status: 404, msg: "not found" });
-      }
-      return comments;
+    .query(`SELECT * FROM reviews WHERE review_id = $1;`, [review_id])
+    .then(({ rows: review }) => {
+      return review[0];
     });
 };

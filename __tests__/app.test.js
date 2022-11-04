@@ -192,93 +192,10 @@ describe("API happy path testing", () => {
       });
     });
 
-    describe("GET /api/reviews", () => {
-      test(`Should respond with a reviews array of review objects, each of which should have the following properties:
-      owner, title, review_id, category, review_img_url, created_at, votes, designer, comment count`, () => {
-        return request(app)
-          .get(`/api/reviews`)
-          .expect(200)
-          .then(({ body: reviews }) => {
-            expect(reviews.length).toBe(13);
-            expect(Array.isArray(reviews)).toBe(true);
-            expect(reviews[0]).toEqual({
-              owner: "mallionaire",
-              review_id: 7,
-              title: "Mollit elit qui incididunt veniam occaecat cupidatat",
-              category: "social deduction",
-              designer: "Avery Wunzboogerz",
-              review_body:
-                "Consectetur incididunt aliquip sunt officia. Magna ex nulla consectetur laboris incididunt ea non qui. Enim id eiusmod irure dolor ipsum in tempor consequat amet ullamco. Occaecat fugiat sint fugiat mollit consequat pariatur consequat non exercitation dolore. Labore occaecat in magna commodo anim enim eiusmod eu pariatur ad duis magna. Voluptate ad et dolore ullamco anim sunt do. Qui exercitation tempor in in minim ullamco fugiat ipsum. Duis irure voluptate cupidatat do id mollit veniam culpa. Velit deserunt exercitation amet laborum nostrud dolore in occaecat minim amet nostrud sunt in. Veniam ut aliqua incididunt commodo sint in anim duis id commodo voluptate sit quis.",
-              review_img_url:
-                "https://images.pexels.com/photos/278888/pexels-photo-278888.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-              created_at: "2021-01-25T11:16:54.963Z",
-              votes: 9,
-              comment_count: "0",
-            });
-          });
-      });
-      test("Reviews should be sorted by date in descending order", () => {
-        return request(app)
-          .get("/api/reviews")
-          .expect(200)
-          .then(({ body: reviews }) => {
-            expect(reviews).toBeSortedBy("created_at", { descending: true });
-          });
-      });
-
-      test(`should accept category query, which filters the reviews by the category value specified in the query. If the query is omitted the endpoint should respond with all reviews.`, () => {
-        return request(app)
-          .get("/api/reviews?category=dexterity")
-          .expect(200)
-          .then(({ body: reviews }) => {
-            expect(reviews).toEqual([
-              {
-                owner: "philippaclaire9",
-                review_id: 2,
-                title: "Jenga",
-                category: "dexterity",
-                designer: "Leslie Scott",
-                review_body: "Fiddly fun for all the family",
-                review_img_url:
-                  "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
-                created_at: "2021-01-18T10:01:41.251Z",
-                votes: 5,
-                comment_count: "3",
-              },
-            ]);
-          });
-      });
-    });
-
-    describe("GET /api/reviews/:review_id/comments", () => {
-      test(`Should respond with array of an array of comments for the given review_id of which each comment 
-  should have the following properties: comment_id, votes, created_at, author, body, review_id`, () => {
-        return request(app)
-          .get("/api/reviews/3/comments")
-          .then(({ body: comments }) => {
-            comments.forEach((comment) => {
-              expect(Object.keys(comment)).toHaveLength(6);
-              expect(comment).toEqual(
-                expect.objectContaining({
-                  comment_id: expect.any(Number),
-                  body: expect.any(String),
-                  review_id: expect.any(Number),
-                  author: expect.any(String),
-                  votes: expect.any(Number),
-                  created_at: expect.any(String),
-                })
-              );
-            });
-          });
-      });
-
-      test("Comments should be served with the most recent comments first ", () => {
-        return request(app)
-          .get("/api/reviews/3/comments")
-          .expect(200)
-          .then(({ body: comments }) => {
-            expect(comments).toBeSortedBy("created_at", { descending: true });
-          });
+    describe('GET /api/reviews/:review_id/comments', () => {
+      test(`Should respond with an array of comments for the given review_id of which each comment should have the following properties:
+      comment_id, votes, created_at, author, body, review_id`, () => {
+        return request(app).get('/api/reviews/:review_id/comments')
       });
     });
 
